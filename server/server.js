@@ -22,15 +22,16 @@ appHelpers.sendFile = function(pathname, res) {
     })
 }
 
-app.get('*.(css|js|png|html|ico)', function (req, res) {
-    var pathname = '.' + req.url;
-    util.puts(pathname);
-    appHelpers.sendFile(pathname, res);
+//send anything with a file extension as normal
+app.get('*.*', function (req, res) {
+    util.puts('.' + req.url);
+    appHelpers.sendFile('.' + req.url, res);
 })
 
-app.get('/*', function (req, res) {
-    var pathname = '.' + '/index.html';
-    appHelpers.sendFile(pathname, res);
+//intercept any paths and send "./index.html":
+app.get('*', function (req, res) {
+    util.puts('./index.html');
+    appHelpers.sendFile('./index.html', res);
 })
 
 app.listen(DEFAULT_PORT);
