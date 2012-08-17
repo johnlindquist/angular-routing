@@ -22,11 +22,11 @@ appHelpers.sendFile = function(pathname, res) {
     })
 }
 
-app.get('/*(css|js|png|html|ico)', function (req, res) {
+app.get('*.(css|js|png|html|ico)', function (req, res) {
     var pathname = '.' + req.url;
+    util.puts(pathname);
     appHelpers.sendFile(pathname, res);
 })
-
 
 app.get('/*', function (req, res) {
     var pathname = '.' + '/index.html';
