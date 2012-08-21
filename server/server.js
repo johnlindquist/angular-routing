@@ -24,13 +24,11 @@ appHelpers.sendFile = function(pathname, res) {
 
 //send anything with a file extension as normal
 app.get('*.*', function (req, res) {
-    util.puts('.' + req.url);
     appHelpers.sendFile('.' + req.url, res);
 })
 
 //intercept any paths and send "./index.html":
 app.get('*', function (req, res) {
-    util.puts('./index.html');
     appHelpers.sendFile('./index.html', res);
 })
 
