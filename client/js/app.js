@@ -1,16 +1,33 @@
-angular.module('enterprise', []).
+angular.module('enterprise', ['enterpriseServices']).
     config(function ($routeProvider, $locationProvider) {
         $locationProvider.html5Mode(true);
 
         $routeProvider.
-            when("/", {templateUrl:"/partials/list.html"}).
+            when("/", {templateUrl:"/partials/list.html", controller:"ListCtrl",
+                resolve:{crew:function ($q, crewResource) {
+                    var deferred = $q.defer();
+                    crewResource.query(function (results) {
+                        deferred.resolve(results);
+                    })
+
+                    return deferred.promise;
+                }}}).
             when("/new", {templateUrl:"/partials/edit.html", controller:"NewCtrl"}).
-            when("/edit/:id", {templateUrl:"/partials/edit.html", controller:"EditCtrl"}).
+            //broken
+            when("/edit/:id", {templateUrl:"/partials/edit.html", controller:"EditCtrl",
+                resolve:{person:function ($q, crewResource, $route) {
+                    var deferred = $q.defer();
+                    crewResource.get({id:$route.current.params.id}, function (results) {
+                        deferred.resolve(results);
+                    })
+
+                    return deferred.promise;
+                }}}).
             otherwise({redirectTo:"/"});
     })
 
-function EditCtrl($scope, $location, $routeParams) {
-    $scope.person = $scope.crew[$routeParams.id];
+function EditCtrl($scope, $location, person) {
+    $scope.person = person;
 
     $scope.save = function () {
         $location.path("/");
@@ -18,18 +35,11 @@ function EditCtrl($scope, $location, $routeParams) {
 }
 
 function NewCtrl($scope, $location) {
-    $scope.person = {name:"", description:""}
 
-    $scope.save = function () {
-        $scope.crew.push($scope.person);
-        $location.path("/")
-    }
 }
 
-function AppCtrl($scope) {
-    $scope.crew = [
-        {name:"Picard", description:"Captain"},
-        {name:"Riker", description:"Number One"},
-        {name:"Worf", description:"Security"},
-    ]
+function ListCtrl($scope, crew) {
+    $scope.crew = crew;
+
 }
+

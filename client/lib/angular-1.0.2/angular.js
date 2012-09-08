@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.0.2-7d77de28
+ * @license AngularJS v1.0.2
  * (c) 2010-2012 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -1247,7 +1247,7 @@ function setupModuleLoader(window) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.0.2-7d77de28',    // all of these placeholder strings will be replaced by rake's
+  full: '1.0.2',    // all of these placeholder strings will be replaced by rake's
   major: 1,    // compile task
   minor: 0,
   dot: 2,
@@ -1529,7 +1529,7 @@ function JQLite(element) {
     var div = document.createElement('div');
     // Read about the NoScope elements here:
     // http://msdn.microsoft.com/en-us/library/ms533897(VS.85).aspx
-    div.innerHTML = '<div>&nbsp;</div>' + element; // IE insanity to make NoScope elements work!
+    div.innerHTML = '<div>&#160;</div>' + element; // IE insanity to make NoScope elements work!
     div.removeChild(div.firstChild); // remove the superfluous div
     JQLiteAddNodes(this, div.childNodes);
     this.remove(); // detach the elements from the temporary DOM div.
@@ -3729,7 +3729,7 @@ function $CompileProvider($provide) {
       // not be able to attach scope data to them, so we will wrap them in <span>
       forEach($compileNode, function(node, index){
         if (node.nodeType == 3 /* text node */) {
-          $compileNode[index] = jqLite(node).wrap('<span>').parent()[0];
+          $compileNode[index] = jqLite(node).wrap('<span></span>').parent()[0];
         }
       });
       var compositeLinkFn = compileNodes($compileNode, transcludeFn, $compileNode, maxPriority);
@@ -5472,27 +5472,25 @@ function $LocationProvider(){
  * The main purpose of this service is to simplify debugging and troubleshooting.
  *
  * @example
-    <doc:example>
-      <doc:source>
-         <script>
-           function LogCtrl($log) {
-             this.$log = $log;
-             this.message = 'Hello World!';
-           }
-         </script>
-         <div ng-controller="LogCtrl">
-           <p>Reload this page with open console, enter text and hit the log button...</p>
-           Message:
-           <input type="text" ng-model="message"/>
-           <button ng-click="$log.log(message)">log</button>
-           <button ng-click="$log.warn(message)">warn</button>
-           <button ng-click="$log.info(message)">info</button>
-           <button ng-click="$log.error(message)">error</button>
-         </div>
-      </doc:source>
-      <doc:scenario>
-      </doc:scenario>
-    </doc:example>
+   <example>
+     <file name="script.js">
+       function LogCtrl($scope, $log) {
+         $scope.$log = $log;
+         $scope.message = 'Hello World!';
+       }
+     </file>
+     <file name="index.html">
+       <div ng-controller="LogCtrl">
+         <p>Reload this page with open console, enter text and hit the log button...</p>
+         Message:
+         <input type="text" ng-model="message"/>
+         <button ng-click="$log.log(message)">log</button>
+         <button ng-click="$log.warn(message)">warn</button>
+         <button ng-click="$log.info(message)">info</button>
+         <button ng-click="$log.error(message)">error</button>
+       </div>
+     </file>
+   </example>
  */
 
 function $LogProvider(){
@@ -6849,8 +6847,9 @@ function $RouteProvider(){
    *
    *    Object properties:
    *
-   *    - `controller` – `{function()=}` – Controller fn that should be associated with newly
-   *      created scope.
+   *    - `controller` – `{(string|function()=}` – Controller fn that should be associated with newly
+   *      created scope or the name of a {@link angular.Module#controller registered controller} 
+   *      if passed as a string.
    *    - `template` – `{string=}` –  html template as a string that should be used by
    *      {@link ng.directive:ngView ngView} or
    *      {@link ng.directive:ngInclude ngInclude} directives.
@@ -6860,7 +6859,7 @@ function $RouteProvider(){
    *    - `resolve` - `{Object.<string, function>=}` - An optional map of dependencies which should
    *      be injected into the controller. If any of these dependencies are promises, they will be
    *      resolved and converted to a value before the controller is instantiated and the
-   *      `$aftreRouteChange` event is fired. The map object is:
+   *      `$afterRouteChange` event is fired. The map object is:
    *
    *      - `key` – `{string}`: a name of a dependency to be injected into the controller.
    *      - `factory` - `{string|function}`: If `string` then it is an alias for a service.
@@ -10144,7 +10143,12 @@ function ngDirective(directive) {
   return valueFn(directive);
 }
 
-/*
+/**
+ * @ngdoc directive
+ * @name ng.directive:a
+ * @restrict E
+ *
+ * @description
  * Modifies the default behavior of html A tag, so that the default action is prevented when href
  * attribute is empty.
  *
@@ -11991,7 +11995,7 @@ var ngListDirective = function() {
 
       ctrl.$parsers.push(parse);
       ctrl.$formatters.push(function(value) {
-        if (isArray(value) && !equals(parse(ctrl.$viewValue), value)) {
+        if (isArray(value)) {
           return value.join(', ');
         }
 
